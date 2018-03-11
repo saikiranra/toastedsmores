@@ -32,13 +32,19 @@ Encoder myEnc(encoderPinA , encoderPinB);
 //begin servo stuff
 
 
-Servo myservo;  // create servo object to control a servo
+Servo claw;  // Claw
+Servo pour; //pour
+Servo reach; //reach
+
 // twelve servo objects can be created on most boards
 
 int pos = 0;    // variable to store the servo position
 
 void setup() {
-  myservo.attach(9);  // attaches the servo on pin 9 to the servo object
+  claw.attach(9);  // claw feachure is pin 9
+  pour.attach(10);  //pour feachure is pin 10
+  reach.attach(11); //reach feachure is pin 11
+  
    Serial.begin(9600); //Assume that the base starts rotated all the way to the right
    pinMode(enB , OUTPUT);
    pinMode(in3 , OUTPUT);
@@ -119,7 +125,7 @@ void openClaw(){
   
    for (pos = 0; pos <= 45; pos += 1) { // goes from 0 degrees to 180 degrees
     // in steps of 1 degree
-    myservo.write(pos);              // tell servo to go to position in variable 'pos'
+    claw.write(pos);              // tell servo to go to position in variable 'pos'
     delay(15);              // waits 15ms for the servo to reach the position
     
   }
@@ -129,7 +135,7 @@ void openClaw(){
 void closeClaw(){
   
    for (pos = 45; pos >= 0; pos -= 1) { // goes from 180 degrees to 0 degrees
-    myservo.write(pos);              // tell servo to go to position in variable 'pos'
+    claw.write(pos);              // tell servo to go to position in variable 'pos'
     delay(15);                       // waits 15ms for the servo to reach the position
   }
   
@@ -140,24 +146,24 @@ void setZero(){
   delay(15);
 }
 void reachStable(){
-  myservo.write(110);
+  reach.write(110);
   delay(1050);
 }
 void reachForward(){
-  myservo.write(60);
+  reach.write(60);
   delay(1050);
 }
 void reachBack(){
-  myservo.write(150);
+  reach.write(150);
   delay(1050);
 }
 
 void pour(){
-  myservo.write(0);
+  pour.write(0);
   delay(1050);
 }
 void goBackPour(){
-  myservo.write(90);
+  pour.write(90);
   delay(1050);
 }
 
