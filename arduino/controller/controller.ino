@@ -44,6 +44,25 @@ void setup() {
   claw.attach(9);  // claw feachure is pin 9
   pour.attach(10);  //pour feachure is pin 10
   reach.attach(11); //reach feachure is pin 11
+
+  //OG states
+  pour.write(90);
+  //reach.write(90);
+  //claw.write(0);
+
+
+  
+  pourBottle();
+ 
+  goBackPour();
+ 
+  //reachForward();
+  
+  //reachStable();
+  //reachBack();
+  //reachStable();
+  
+  //claw.write(0);
   
    Serial.begin(9600); //Assume that the base starts rotated all the way to the right
    pinMode(enB , OUTPUT);
@@ -101,7 +120,7 @@ void updateBaseController(){
 }
 
 void setBaseSpeed(int value , bool dir){
-  //value - int between 0 and 255
+ 
   //dir - direction, True is forward, False is backward
   speedSet = true;
   if(value == 0){
@@ -123,7 +142,7 @@ void setBaseSpeed(int value , bool dir){
 
 void openClaw(){
   
-   for (pos = 0; pos <= 45; pos += 1) { // goes from 0 degrees to 180 degrees
+   for (pos = 0; pos <= 45; pos += 1) { // goes from 0 degrees to 45 degrees
     // in steps of 1 degree
     claw.write(pos);              // tell servo to go to position in variable 'pos'
     delay(15);              // waits 15ms for the servo to reach the position
@@ -134,7 +153,7 @@ void openClaw(){
 }
 void closeClaw(){
   
-   for (pos = 45; pos >= 0; pos -= 1) { // goes from 180 degrees to 0 degrees
+   for (pos = 45; pos >= 0; pos -= 1) { //goes from 45 deg to 0 deg
     claw.write(pos);              // tell servo to go to position in variable 'pos'
     delay(15);                       // waits 15ms for the servo to reach the position
   }
@@ -144,15 +163,15 @@ void closeClaw(){
 
 void reachStable(){
   reach.write(110);
-  delay(1050);
+  delay(2050);
 }
 void reachForward(){
   reach.write(60);
-  delay(1050);
+  delay(2050);
 }
 void reachBack(){
   reach.write(150);
-  delay(1050);
+  delay(2050);
 }
 
 void pourBottle(){
@@ -169,7 +188,7 @@ void loop() {
  //closeClaw();
  //setZero();
  
-  speedSet = false;
+ /* speedSet = false;
   String nextCommand = "";
   char character;
   if (Serial.available()) {
@@ -228,7 +247,7 @@ void loop() {
   if(!speedSet){
     setBaseSpeed(0 , true);
   }
-  delay(20);
+  delay(20); */
  
  
 }
