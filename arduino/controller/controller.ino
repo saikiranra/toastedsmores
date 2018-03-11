@@ -2,6 +2,7 @@
 int encoderPinA = 2;
 int encoderPinB = 3;
 
+
 void setup() {
   // put your setup code here, to run once:
 
