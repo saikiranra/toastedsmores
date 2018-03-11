@@ -129,7 +129,7 @@ void openClaw(){
     delay(15);              // waits 15ms for the servo to reach the position
     
   }
-  myservo.write(0);
+  claw.write(0);
 
 }
 void closeClaw(){
@@ -141,10 +141,7 @@ void closeClaw(){
   
 
 }
-void setZero(){
-  myservo.write(90); //set position to 0
-  delay(15);
-}
+
 void reachStable(){
   reach.write(110);
   delay(1050);
@@ -158,7 +155,7 @@ void reachBack(){
   delay(1050);
 }
 
-void pour(){
+void pourBottle(){
   pour.write(0);
   delay(1050);
 }
@@ -194,28 +191,28 @@ void loop() {
         iError = 0;
         runLoop = true;
     }
-    if(nextCommand.substring(0,5) == "OCLAW"{
+    if(nextCommand.substring(0,5) == "OCLAW"){
         openClaw();
         //open
       
     }
-    if(nextCommand.substring(0,5) == "CCLAWA"{
+    if(nextCommand.substring(0,5) == "CCLAWA"){
         closeClaw();
         //close
     }
 
-    if(nextCommand.substring(0,4) == "POUR"{
-      pour();
+    if(nextCommand.substring(0,4) == "POUR"){
+      pourBottle();
       goBackPour();
     }
 
-    if(nextCommand.substring(0,4) == "FEXT"{
+    if(nextCommand.substring(0,4) == "FEXT"){
       reachForward();
     }
-     if(nextCommand.substring(0,4) == "BEXT"{
+     if(nextCommand.substring(0,4) == "BEXT"){
       reachBack();
     }
-    if(nextCommand.substring(0,4) == "EXTS"{
+    if(nextCommand.substring(0,4) == "EXTS"){
       reachStable();
     }
 
