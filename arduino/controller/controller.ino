@@ -1,5 +1,7 @@
 #include <Encoder.h>
+#include <Servo.h>
 
+//encoder stuff
 int encoderPinA = 2;
 int encoderPinB = 3;
 
@@ -25,17 +27,48 @@ String command = "";
 unsigned long lastTimeStamp;
 
 Encoder myEnc(encoderPinA , encoderPinB);
+// end encoder stuff
+
+//begin servo stuff
+
+
+Servo claw;  // Claw
+Servo pour; //pour
+Servo reach; //reach
+
+// twelve servo objects can be created on most boards
+
+int pos = 0;    // variable to store the servo position
 
 void setup() {
-  Serial.begin(9600);
-  //Assume that the base starts rotated all the way to the right
-  //
+  claw.attach(9);  // claw feachure is pin 9
+  pour.attach(10);  //pour feachure is pin 10
+  reach.attach(11); //reach feachure is pin 11
 
-  pinMode(enB , OUTPUT);
-  pinMode(in3 , OUTPUT);
-  pinMode(in4 , OUTPUT);
+  //OG states
+  pour.write(90);
+  //reach.write(90);
+  //claw.write(0);
+
+
+  
+  pourBottle();
+ 
+  goBackPour();
+ 
+  //reachForward();
+  
+  //reachStable();
+  //reachBack();
+  //reachStable();
+  
+  //claw.write(0);
+  
+   Serial.begin(9600); //Assume that the base starts rotated all the way to the right
+   pinMode(enB , OUTPUT);
+   pinMode(in3 , OUTPUT);
+   pinMode(in4 , OUTPUT);
 }
-
 long oldPosition  = -999;
 
 int getCurrentAngle(){
@@ -47,7 +80,6 @@ int getCurrentAngle(){
   //Serial.println(encoderPosition);
   return (int) encoderPosition;
 }
-
 void updateBaseController(){
   //0 to 255
   unsigned long currentTimeStamp = millis();
@@ -88,7 +120,7 @@ void updateBaseController(){
 }
 
 void setBaseSpeed(int value , bool dir){
-  //value - int between 0 and 255
+ 
   //dir - direction, True is forward, False is backward
   speedSet = true;
   if(value == 0){
@@ -106,9 +138,57 @@ void setBaseSpeed(int value , bool dir){
 
   analogWrite(enB , value);
 }
+// servo stuff
+
+void openClaw(){
+  
+   for (pos = 0; pos <= 45; pos += 1) { // goes from 0 degrees to 45 degrees
+    // in steps of 1 degree
+    claw.write(pos);              // tell servo to go to position in variable 'pos'
+    delay(15);              // waits 15ms for the servo to reach the position
+    
+  }
+  claw.write(0);
+
+}
+void closeClaw(){
+  
+   for (pos = 45; pos >= 0; pos -= 1) { //goes from 45 deg to 0 deg
+    claw.write(pos);              // tell servo to go to position in variable 'pos'
+    delay(15);                       // waits 15ms for the servo to reach the position
+  }
+  
+
+}
+
+void reachStable(){
+  reach.write(110);
+  delay(2050);
+}
+void reachForward(){
+  reach.write(60);
+  delay(2050);
+}
+void reachBack(){
+  reach.write(150);
+  delay(2050);
+}
+
+void pourBottle(){
+  pour.write(0);
+  delay(1050);
+}
+void goBackPour(){
+  pour.write(90);
+  delay(1050);
+}
 
 void loop() {
-  speedSet = false;
+// openClaw();
+ //closeClaw();
+ //setZero();
+ 
+ /* speedSet = false;
   String nextCommand = "";
   char character;
   if (Serial.available()) {
@@ -130,6 +210,32 @@ void loop() {
         iError = 0;
         runLoop = true;
     }
+    if(nextCommand.substring(0,5) == "OCLAW"){
+        openClaw();
+        //open
+      
+    }
+    if(nextCommand.substring(0,5) == "CCLAWA"){
+        closeClaw();
+        //close
+    }
+
+    if(nextCommand.substring(0,4) == "POUR"){
+      pourBottle();
+      goBackPour();
+    }
+
+    if(nextCommand.substring(0,4) == "FEXT"){
+      reachForward();
+    }
+     if(nextCommand.substring(0,4) == "BEXT"){
+      reachBack();
+    }
+    if(nextCommand.substring(0,4) == "EXTS"){
+      reachStable();
+    }
+
+    
     if(nextCommand == "STOP"){
       runLoop = false;
     }
@@ -141,5 +247,8 @@ void loop() {
   if(!speedSet){
     setBaseSpeed(0 , true);
   }
-  delay(20);
+  delay(20); */
+ 
+ 
 }
+
