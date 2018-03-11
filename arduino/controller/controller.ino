@@ -1,5 +1,7 @@
 #include <Encoder.h>
+#include <Servo.h>
 
+//encoder stuff
 int encoderPinA = 2;
 int encoderPinB = 3;
 
@@ -25,17 +27,23 @@ String command = "";
 unsigned long lastTimeStamp;
 
 Encoder myEnc(encoderPinA , encoderPinB);
+// end encoder stuff
+
+//begin servo stuff
+
+
+Servo myservo;  // create servo object to control a servo
+// twelve servo objects can be created on most boards
+
+int pos = 0;    // variable to store the servo position
 
 void setup() {
-  Serial.begin(9600);
-  //Assume that the base starts rotated all the way to the right
-  //
-
-  pinMode(enB , OUTPUT);
-  pinMode(in3 , OUTPUT);
-  pinMode(in4 , OUTPUT);
+  myservo.attach(9);  // attaches the servo on pin 9 to the servo object
+   Serial.begin(9600); //Assume that the base starts rotated all the way to the right
+   pinMode(enB , OUTPUT);
+   pinMode(in3 , OUTPUT);
+   pinMode(in4 , OUTPUT);
 }
-
 long oldPosition  = -999;
 
 int getCurrentAngle(){
@@ -47,7 +55,6 @@ int getCurrentAngle(){
   //Serial.println(encoderPosition);
   return (int) encoderPosition;
 }
-
 void updateBaseController(){
   //0 to 255
   unsigned long currentTimeStamp = millis();
@@ -106,8 +113,59 @@ void setBaseSpeed(int value , bool dir){
 
   analogWrite(enB , value);
 }
+// servo stuff
+
+void openClaw(){
+  
+   for (pos = 0; pos <= 45; pos += 1) { // goes from 0 degrees to 180 degrees
+    // in steps of 1 degree
+    myservo.write(pos);              // tell servo to go to position in variable 'pos'
+    delay(15);              // waits 15ms for the servo to reach the position
+    
+  }
+  myservo.write(0);
+
+}
+void closeClaw(){
+  
+   for (pos = 45; pos >= 0; pos -= 1) { // goes from 180 degrees to 0 degrees
+    myservo.write(pos);              // tell servo to go to position in variable 'pos'
+    delay(15);                       // waits 15ms for the servo to reach the position
+  }
+  
+
+}
+void setZero(){
+  myservo.write(90); //set position to 0
+  delay(15);
+}
+void reachStable(){
+  myservo.write(110);
+  delay(1050);
+}
+void reachForward(){
+  myservo.write(60);
+  delay(1050);
+}
+void reachBack(){
+  myservo.write(150);
+  delay(1050);
+}
+
+void pour(){
+  myservo.write(0);
+  delay(1050);
+}
+void goBackPour(){
+  myservo.write(90);
+  delay(1050);
+}
 
 void loop() {
+// openClaw();
+ //closeClaw();
+ //setZero();
+ 
   speedSet = false;
   String nextCommand = "";
   char character;
@@ -130,6 +188,32 @@ void loop() {
         iError = 0;
         runLoop = true;
     }
+    if(nextCommand.substring(0,5) == "OCLAW"{
+        openClaw();
+        //open
+      
+    }
+    if(nextCommand.substring(0,5) == "CCLAWA"{
+        closeClaw();
+        //close
+    }
+
+    if(nextCommand.substring(0,4) == "POUR"{
+      pour();
+      goBackPour();
+    }
+
+    if(nextCommand.substring(0,4) == "FEXT"{
+      reachForward();
+    }
+     if(nextCommand.substring(0,4) == "BEXT"{
+      reachBack();
+    }
+    if(nextCommand.substring(0,4) == "EXTS"{
+      reachStable();
+    }
+
+    
     if(nextCommand == "STOP"){
       runLoop = false;
     }
@@ -142,4 +226,7 @@ void loop() {
     setBaseSpeed(0 , true);
   }
   delay(20);
+ 
+ 
 }
+
