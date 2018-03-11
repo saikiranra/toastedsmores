@@ -7,9 +7,9 @@ int enB = 5; //Speed enable
 int in3 = 7; //Motor controller enable
 int in4 = 6; //Motor controller enable
 
-float baseP = 50;
-float baseI = 0.5;
-float baseD = 0;
+float baseP = 100;
+float baseI = 1;
+float baseD = 0.3;
 
 float iError = 0;
 float prevError = 0;
@@ -76,7 +76,7 @@ void updateBaseController(){
   }
   if(output != 0){
     String message = "Angle: " + String(getCurrentAngle()) + " Setpoint: " + String(baseSetpoint) + " Out: " + String(output);
-    Serial.println(message);
+    //Serial.println(message);
   }
   if(output < 0){
     output = -output;
@@ -123,10 +123,10 @@ void loop() {
   }
 
   if(nextCommand != ""){
-    Serial.println(nextCommand);
+    //Serial.println(nextCommand);
     if(nextCommand.substring(0 , 4) == "BASE"){
         baseSetpoint = nextCommand.substring(4 , 7).toInt();
-        Serial.println("SETTING BASE TO " + String(baseSetpoint));
+        //Serial.println("SETTING BASE TO " + String(baseSetpoint));
         iError = 0;
         runLoop = true;
     }
