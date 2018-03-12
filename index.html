@@ -3,3 +3,24 @@
 </html>
 
 <h1>Arduino Files</h1>
+
+<h1>
+	Vision
+</h1>
+	
+<body>
+	The vision aspect of the project was implemented by using Python with OpenCV. 
+	Image classification was accomplished by using a pretrained machine learning model called MobileNet. 
+	The MobileNet model leveraged the ideal balance between accuracy and performance. 
+	Once the vision module identified an bottle object classification, it would perform a search around the surrounding 
+	bounding box in order to search for a QR code. It would search for a QR code to determine what kind of bottle it was.
+</body>
+
+<ol type="1">
+	<li> Detect and Classify Objects </Object></li>
+	<li> Find the Position for a Bottle </li>
+	<li> Read the QR Code on the Bottle </li>
+	<li> Determine the Contents of the Bottle </li>
+  </ol>
+
+<img src="images/bottleClassification.png" alt="Bottle Classification" style="width:1280px;height:720;">
