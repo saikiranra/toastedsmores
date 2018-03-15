@@ -57,9 +57,16 @@ class Bottle:
 
         #crop image
         frame = Image.fromarray(frame)
-        image = frame.crop((x, y, x+2*w, y+2*h))
+        #image = frame.crop((x, y, x+0.5*w, y+0.5*h))
+        image = frame.crop((x-0.5*w, y-0.5*h, x+1.5*w, y+1.5*h))
+        #image = frame.crop((x, y, x+1.5*w, y+1.5*h))
+
 
         codes = decode(image)
+        if(len(codes) < 1):
+            self.bottle["name"] = "empty"
+            return 
+
         for c in codes: #ideally only one code will be found
             data = c.data
             #convert byte string to regular string
@@ -146,7 +153,7 @@ def bottlesToFile():
         #reset last written time
         writeTime = time.time()
 
-    #print(bottleJSON)
+    print(bottleJSON)
 
 def main():
     global vs, bottles
@@ -210,7 +217,8 @@ def main():
         bottlesToFile()
 
         #end the bottles after frame
-        bottles[:] = []
+        #bottles[:] = []
+        bottles.clear()
 
     # stop the timer and display FPS information
     fps.stop()

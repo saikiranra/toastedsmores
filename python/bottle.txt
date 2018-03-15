@@ -1,1 +1,1 @@
-{"bottles": []}
+{"bottles": [{"x": 230, "y": 84, "width": 214, "height": 126, "name": "empty"}, {"x": 230, "y": 84, "width": 214, "height": 126, "name": "empty"}]}
