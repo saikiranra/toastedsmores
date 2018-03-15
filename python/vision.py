@@ -51,16 +51,18 @@ class Bottle:
         w = self.bottle["width"]
         h = self.bottle["height"]
 
+        frame = Image.fromarray(frame)
+        mw, mh = frame.size
+
         #make bounding box twice as big
-        x = (x-w) if (x-w) > 0 else 0
-        y = (y-h) if (y-h) > 0 else 0
+        x1 = (x-0.5*w) if (x-0.5*w) > 0 else 0
+        y1 = (y-0.5*h) if (y-0.5*h) > 0 else 0
+        
+        x2 = (x+1.5*w) if (x+1.5*w) < mw else mw
+        y2 = (y+1.5*h) if (y+1.5*h) < mh else mh
 
         #crop image
-        frame = Image.fromarray(frame)
-        #image = frame.crop((x, y, x+0.5*w, y+0.5*h))
-        image = frame.crop((x-0.5*w, y-0.5*h, x+1.5*w, y+1.5*h))
-        #image = frame.crop((x, y, x+1.5*w, y+1.5*h))
-
+        image = frame.crop((x1, y1, x2, y2))
 
         codes = decode(image)
         if(len(codes) < 1):
@@ -187,7 +189,7 @@ def main():
         # to have a maximum width of 400 pixels
         val, frame = vs.read()
         frame = imutils.resize(frame, width=width)
-
+        frame = cv2.flip(frame, -1)
         #qreadBarCode(frame)
 
         # grab the frame dimensions and convert it to a blob

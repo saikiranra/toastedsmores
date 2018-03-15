@@ -9,7 +9,7 @@ import serial
 import json
 from collections import defaultdict
 
-BASE_RANGE = 200
+BASE_RANGE = 60
 E = None
 R = None
 
@@ -18,13 +18,13 @@ class env():
         #400(x) by 225(y) 
         self.raw = {}
         self.objLookup = defaultdict(list)
-        self.scanResolution = 20 #degrees
+        self.scanResolution = 10 #degrees
 
     def addFrame(self, angle, jsonFrame):
         self.raw[angle] = jsonFrame
         objects = jsonFrame["bottles"]
         for objFrame in objects:
-            self.objLookup[objFrame["name"]] = (angle , objFrame)
+            self.objLookup[objFrame["name"]].append((angle , objFrame))
 
     def frameToCenterDistance(self , frame):
         """
@@ -44,13 +44,33 @@ class env():
                 out = frame
             elif self.frameToCenterDistance(frame[1]) < self.frameToCenterDistance(out[1]):
                 out = frame
+        return out
 
     def getItemAngle(self , item):
-        return self.findItem[item][0]
+        bestFrame = self.findItem(item)
+        centerY = bestFrame[1]["y"] + (bestFrame[1]["width"]/2)
+        deltaCenter = (225 / 2) - centerY
+        mult = 0
+        if deltaCenter > 0: 
+            if deltaCenter  < 30:
+                pass
+            elif deltaCenter < 60: 
+                mult = 1
+            else:
+                mult = 2
+        else:
+            if deltaCenter > 30:
+                pass
+            if deltaCenter > 60:
+                mult = 1
+            else:
+                mult = 2       
+
+        return self.findItem(item)[0] + (mult * 2)
             
 class robot():
     def __init__(self):
-        self.serial = serial.Serial('COM6', 9600)
+        self.serial = serial.Serial('/dev/tty.usbmodem14421', 9600)
 
     def writeCommand(self, command):
         self.serial.write((command + " ").encode())
@@ -62,10 +82,21 @@ class robot():
         message = "BASE{:03d}".format(angle)
         self.writeCommand(message)
 
+    def outPosition(self):
+        self.writeCommand("FEXT")
+
+    def stablePosition(self):
+        self.writeCommand("EXTS")
+
+    def stowePosition(self):
+        self.writeCommand("BEXT")
+
     def pour(self):
         """
         """
-        pass
+        self.writeCommand("POUR")
+        time.sleep(1)
+        self.writeCommand("SPOUR")
 
     def upright(self):
         """
@@ -77,7 +108,9 @@ class robot():
         """
         Tells arduino to go to scan config
         """
-        pass
+        self.outPosition()
+        time.sleep(1)
+        self.stowePosition()
 
     def stop(self):
         self.writeCommand("STOP")
@@ -90,21 +123,46 @@ def getJSONFrame():
     return json.load(open(fname))
 
 def scan():
-    gotoScanPosition()
+    global E, R
     E = env()
     R = robot()
+    time.sleep(2)
+    R.stowePosition()
+    time.sleep(1)
     for i in range(int(BASE_RANGE/E.scanResolution) + 1):
         degrees = i * E.scanResolution
         R.baseAngle(degrees) #send robot arm to base angle
+        time.sleep(3)
+        R.stop()
         time.sleep(2)
-        jsonFrame = getJSONFrame() #get JSON frame from camera
-        E.addFrame(degrees , jsonFrame)
+        for i in range(100):
+            jsonFrame = getJSONFrame() #get JSON frame from camera
+            E.addFrame(degrees , jsonFrame)
+            time.sleep(0.02)
 
 def goToItem(item):
     angle = E.getItemAngle(item)
+    print(angle)
     R.baseAngle(angle)
     time.sleep(1)
     R.stop()
+
+
+scan()
+print("ITEMS")
+print(E.objLookup.keys())
+goToItem("milk")
+time.sleep(0.5)
+R.outPosition()
+time.sleep(2)
+R.stablePosition()
+time.sleep(1)
+goToItem("cup")
+R.outPosition()
+time.sleep(2)
+R.pour()
+time.sleep(0.5)
+R.stowePosition()
 
 
     
