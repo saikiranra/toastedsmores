@@ -7,7 +7,7 @@ Assumes 200 degrees of range, starting 0 all the way to the left
 import time
 import serial
 import json
-import defaultdict
+from collections import defaultdict
 
 BASE_RANGE = 200
 E = None
