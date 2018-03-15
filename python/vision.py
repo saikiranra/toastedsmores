@@ -80,7 +80,7 @@ def readBarCode(frame):
 
 def classify(detections , w, h, CLASSES, COLORS, frame):
     global bottles
-    minConfidence = 0.5
+    minConfidence = 0.1
     # loop over the detections
     for i in np.arange(0, detections.shape[2]):
         # extract the confidence (i.e., probability) associated with
@@ -110,7 +110,7 @@ def classify(detections , w, h, CLASSES, COLORS, frame):
 
         # filter out weak detections by ensuring the `confidence` is
         # greater than the minimum confidence
-        '''if confidence > minConfidence:
+        if confidence > minConfidence:
             # draw the prediction on the frame
             label = "{}: {:.2f}%".format(CLASSES[idx],
                 confidence * 100)
@@ -118,7 +118,7 @@ def classify(detections , w, h, CLASSES, COLORS, frame):
                 COLORS[idx], 2)
             y = startY - 15 if startY - 15 > 15 else startY + 15
             cv2.putText(frame, label, (startX, y),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.5, COLORS[idx], 2)'''
+                cv2.FONT_HERSHEY_SIMPLEX, 0.5, COLORS[idx], 2)
 
 writeTime = time.time()
 writeInterval = 1
@@ -196,7 +196,7 @@ def main():
         classify(detections, w, h, CLASSES, COLORS, frame)
 
         # show the output frame
-        #cv2.imshow("Frame", frame)
+        cv2.imshow("Frame", frame)
         key = cv2.waitKey(1) & 0xFF
 
         # if the `q` key was pressed, break from the loop
