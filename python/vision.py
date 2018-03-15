@@ -15,7 +15,9 @@ import json
 import time
 
 bottles = []
-vs = VideoStream(src=0)
+#vs = VideoStream(src=1)
+vs = cv2.VideoCapture(0) 
+
 
 class Bottle:
     bottle = dict()
@@ -70,7 +72,8 @@ class Bottle:
     def __str__(self):
         return self.toJSON()
 
-def readBarCode(image):
+def readBarCode(frame):
+    image = Image.fromarray(frame)
     codes = decode(image)
     if(len(codes) > 0):
         print('QR codes: %s' % codes)
@@ -107,7 +110,7 @@ def classify(detections , w, h, CLASSES, COLORS, frame):
 
         # filter out weak detections by ensuring the `confidence` is
         # greater than the minimum confidence
-        if confidence > minConfidence:
+        '''if confidence > minConfidence:
             # draw the prediction on the frame
             label = "{}: {:.2f}%".format(CLASSES[idx],
                 confidence * 100)
@@ -115,7 +118,7 @@ def classify(detections , w, h, CLASSES, COLORS, frame):
                 COLORS[idx], 2)
             y = startY - 15 if startY - 15 > 15 else startY + 15
             cv2.putText(frame, label, (startX, y),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.5, COLORS[idx], 2)
+                cv2.FONT_HERSHEY_SIMPLEX, 0.5, COLORS[idx], 2)'''
 
 writeTime = time.time()
 writeInterval = 1
@@ -165,8 +168,8 @@ def main():
 	# initialize the video stream, allow the cammera sensor to warmup,
 	# and initialize the FPS counter
     print("[INFO] starting video stream...")
-    vs.start()
-    time.sleep(2.0)
+    #vs.start()
+    time.sleep(3.0)
     fps = FPS().start()
     width = 400
     height = 400
@@ -175,10 +178,10 @@ def main():
     while True:
         # grab the frame from the threaded video stream and resize it
         # to have a maximum width of 400 pixels
-        frame = vs.read()
+        val, frame = vs.read()
         frame = imutils.resize(frame, width=width)
 
-        readBarCode(frame)
+        #qreadBarCode(frame)
 
         # grab the frame dimensions and convert it to a blob
         (h, w) = frame.shape[:2]
@@ -193,7 +196,7 @@ def main():
         classify(detections, w, h, CLASSES, COLORS, frame)
 
         # show the output frame
-        cv2.imshow("Frame", frame)
+        #cv2.imshow("Frame", frame)
         key = cv2.waitKey(1) & 0xFF
 
         # if the `q` key was pressed, break from the loop
