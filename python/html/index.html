@@ -1,0 +1,249 @@
+<!-- Head. Used to add imports, set a lot of 'metatags' and to signal the start of the page. If we want to work with Cookies and other session storage objects, we must put them before the head. -->
+<head> 
+    <!-- Importing CSS files -->
+    <link href="externalCSS/bootstrap.min.css" rel="stylesheet">
+	<link href="externalCSS/bootstrap-material-design.min.css" rel="stylesheet">
+    <link href="externalCSS/ripples.min.css" rel="stylesheet">
+    <link href="externalCSS/material-theme.css" rel="stylesheet">
+		<!-- Importing JS files -->
+	<script src="externalJS/jquery-1.11.2.min.js"></script>
+	<script src="externalJS/bootstrap.min.js"></script>
+	<script src="externalJS/material.min.js"></script>
+	<script src="externalJS/ripples.min.js"></script>
+	<script src="http://rubaxa.github.io/Sortable/Sortable.js"></script>
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<!-- Adding script tags for Jquery init of dropdown and material bootstrap -->
+ <script>
+     $(document).ready(function(){
+		$.material.init();
+    });
+</script>
+
+<nav class="navbar navbar-material-red navbar-static-top " role="navigation">
+	<div class = "container">
+		<!-- Drop down button for small screens -->
+		<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+		<!-- Left justified logo/text -->
+		<div class="navbar-header">
+			<a class="navbar-brand" href="index.php">
+				Toasted Smores Kitchen Automation Application
+			</a>
+		</div>
+		<!-- What goes under the drop down button/rest of navbar -->
+		<div class="collapse navbar-collapse">
+			<ul class="nav navbar-nav navbar-left">
+				<!-- <li><a href="userRegistration.php">User Registration</a></li> -->
+			</ul>
+		</div>
+	</div>
+</nav>
+
+<script>
+	function sendDrinkOrder(){
+		var order = getItemOrderList();
+		var cup = getCupItem();
+		var url = "command?sequence&order="+order+"&cup="+cup;
+		console.log(url);
+		$.getJSON('http://localhost:8000/' + url, function(data) {
+		});
+	}
+	
+	function scanEnv(){
+		$.getJSON('http://localhost:8000/command?scan', function(data) {
+		});
+	}
+	
+	function getItemOrderList(){
+		out = "";
+		var first = true;
+		$("#drinkMix li").each(function(item){
+			if(!first){
+				out += ",";
+			}
+			first = false;
+			out += $(this).text().trim();
+		});
+		return out;
+	}
+	
+	function getCupItem(){
+		out = "";
+		var first = true;
+		$("#cupItem li").each(function(item){
+			if(!first){
+				alert("Multiple Cups Not Supported!");
+			}
+			first = false;
+			out += $(this).text().trim();
+		});
+		return out;
+	}
+	
+	function setEnabled(b){
+		if(b){
+			$("#isEnabledButton").removeClass("label-warning");
+			$("#isEnabledButton").addClass("label-success");
+			$("#isEnabledButton").html('Enabled');
+		}
+		else{
+			$("#isEnabledButton").removeClass("label-success");
+			$("#isEnabledButton").addClass("label-warning");
+			$("#isEnabledButton").html('Disabled');
+		}
+	}
+	
+	function setControlLoop(b){
+		if(b){
+			$("#controlLoopStatus").removeClass("label-warning");
+			$("#controlLoopStatus").addClass("label-success");
+			$("#controlLoopStatus").html('Control Loop Enabled');
+		}
+		else{
+			$("#controlLoopStatus").removeClass("label-success");
+			$("#controlLoopStatus").addClass("label-warning");
+			$("#controlLoopStatus").html('Control Loop Disabled');
+		}
+	}
+	
+	function setClawStatus(b){
+		if(b == "open"){
+			$("#clawStatus").removeClass("label-warning");
+			$("#clawStatus").addClass("label-success");
+			$("#clawStatus").html('Claw Open');
+		}
+		else{
+			$("#clawStatus").removeClass("label-success");
+			$("#clawStatus").addClass("label-warning");
+			$("#clawStatus").html('Claw Closed');
+		}
+	}
+	
+	function setWristStatus(b){
+		if(b == "stable"){
+			$("#wristStatus").removeClass("label-warning");
+			$("#wristStatus").addClass("label-success");
+			$("#wristStatus").html('Wrist Up');
+		}
+		else{
+			$("#wristStatus").removeClass("label-success");
+			$("#wristStatus").addClass("label-warning");
+			$("#wristStatus").html('Wrist Down');
+		}
+	}
+	
+	function setExtensionStatus(b){
+		if(b == "stable"){
+			$("#extensionStatus").removeClass("label-warning");
+			$("#extensionStatus").addClass("label-success");
+			$("#extensionStatus").html('Arm Stable');
+		}
+		else if(b == "forward"){
+			$("#extensionStatus").removeClass("label-warning");
+			$("#extensionStatus").addClass("label-primary");
+			$("#extensionStatus").html('Arm Out');
+		}
+		else{
+			$("#extensionStatus").removeClass("label-success");
+			$("#extensionStatus").addClass("label-warning");
+			$("#extensionStatus").html('Arm Back');
+		}
+	}
+	
+	
+	
+	function updatePage(){
+		$.getJSON('http://localhost:8000/data?robot', function(data) {
+			setEnabled(data["enabled"]);
+			setControlLoop(data["controlLoop"]);
+			setClawStatus(data["claw"]);
+			setExtensionStatus(data["ext"]);
+			setWristStatus(data["wrist"]);
+		});
+	}
+	
+	function updateIngredients(){
+		$.getJSON('http://localhost:8000/data?env', function(data) {
+			$("#ingredientSources").empty();
+			for (var item in data) {
+				var out = '<li><div class="list-group-item"><div class="row-picture"><img class="circle" src="images/'+item+'.jpg" alt="icon"></div><div class="row-content"><h4 class="list-group-item-heading">'+ item + '</h4></div></div></li>'
+				$("#ingredientSources").append(out);
+			}
+		});
+	}
+	
+	
+	
+	$( document ).ready(function() {
+		var removeItem = function(evt){
+			evt.from.splice(evt.oldIndex, 1);
+			console.log(evt.oldIndex);
+		};
+		Sortable.create(document.getElementById('ingredientSources') , {sort : false , group : {name: 'items' , put:false , pull:'clone'} , animation: 150});
+		Sortable.create(document.getElementById('drinkMix') , {sort : true , group : {name: 'items' ,  put:true , pull:true} , animation: 150 , });
+		Sortable.create(document.getElementById('cupItem') , {sort : true , group : {name: 'items' ,  put:true , pull:true} , animation: 150 , });
+		
+		window.setInterval(function(){
+			updatePage();
+		}, 5000);
+		
+	});
+	
+	
+	
+</script>
+	
+<body>
+	<div class="container rowisEnabledButton-offcanvas row-offcanvas-left">
+		<div class="well column  col-lg-12  col-sm-12 col-xs-12" id="content">
+			<h1>Control Panel</h1>
+			
+			<span id="isEnabledButton" class="label  disabled" >Disabled</span>
+			<span id="controlLoopStatus" class="label  disabled" >Control Loop Disabled</span>
+			<span id="wristStatus" class="label  disabled" >Wrist Unknown</span>
+			<span id="extensionStatus" class="label  disabled" >Extension Unknown</span>
+			<span id="clawStatus" class="label  disabled" >Claw Unknown</span>
+			
+			<br>
+			
+			<a onclick="scanEnv()" class="btn btn-raised btn-danger">Scan Environment</a>
+			
+			<h2>Create Drink</h2>
+
+			<a onclick="updateIngredients()" class="btn btn-raised btn-info">Update Ingredients</a>
+			<a onclick="sendDrinkOrder()" class="btn btn-raised btn-success">Make Drink</a>
+			<br>
+			
+			<div class="col-md-6">
+			  <h3>Ingredients</h3>
+			  <ul class="list-group list-unstyled" id="ingredientSources">
+
+			  </ul>
+			</div>
+			
+			<div class="col-md-6">
+				<h3>Drink</h3>
+			  <ul class="list-group list-unstyled" id="drinkMix" style="min-height: 200px;">
+				
+			  </ul>
+			</div>
+			
+			<div class="col-md-6">
+				<h3>Cup</h3>
+			  <ul class="list-group list-unstyled" id="cupItem" style="min-height: 200px;">
+				
+			  </ul>
+			</div>
+			
+			
+
+
+		</div>
+	</div>
+</body>

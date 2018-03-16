@@ -16,7 +16,7 @@ import time
 
 bottles = []
 #vs = VideoStream(src=1)
-vs = cv2.VideoCapture(0) 
+vs = cv2.VideoCapture(1) 
 
 
 class Bottle:
