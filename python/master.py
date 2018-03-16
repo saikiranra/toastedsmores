@@ -56,6 +56,7 @@ class ToastedSmoresWebServer(http.server.BaseHTTPRequestHandler):
                     out[kvsplit[0]] = temp
                 else:
                     out[kvsplit[0]] = kvsplit[1]
+        print(json.dumps(out))
         return out
 
     def setCommand(self):
