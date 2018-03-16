@@ -19,6 +19,10 @@ class environment():
 
         return json.dumps(out)
 
+    def reset(self):
+        self.raw = {}
+        self.objLookup = defaultdict(list)
+
     def addFrame(self, angle, jsonFrame):
         self.raw[angle] = jsonFrame
         objects = jsonFrame["bottles"]
@@ -37,6 +41,8 @@ class environment():
         """
         Find the closest item to center
         """
+        print("FindingItem")
+        print(item)
         out = None
         for frame in self.objLookup[item]:
             if out == None:

@@ -109,17 +109,7 @@ class ToastedSmoresWebServer(http.server.BaseHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    global rob
-    global env
-    global rout
-    rob = robot.robot("COM3")
+    rob = robot.robot("/dev/tty.usbmodem14421")
     env = environment.environment()
     rout = routines.routines(rob , env)
     ToastedSmoresWebServer.serve_forever(8000)
-
-
-
-
-    
-
-        

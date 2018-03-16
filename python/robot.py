@@ -11,13 +11,14 @@ class robot():
         self.clawPos = "open"
         self.wristPos = "stable"
         self.controlLoopEnabled = False
-        self.baseAngle = 0
+        self.angle = 0
         self.enabled = False
 
     def connect(self):
         try:
             self.serial = serial.Serial(self.com, 9600)
             self.enabled = True
+            print("Connected to Arduino!")
         except:
             pass
 
@@ -27,7 +28,7 @@ class robot():
         out["claw"] = self.clawPos
         out["wrist"] = self.wristPos
         out["controlLoop"] = self.controlLoopEnabled
-        out["base"] = self.baseAngle
+        out["base"] = self.angle
         out["enabled"] = self.enabled
 
         return json.dumps(out)
@@ -46,7 +47,7 @@ class robot():
         """
         message = "BASE{:03d}".format(angle)
         self.writeCommand(message)
-        self.baseAngle(angle)
+        self.angle = angle
         self.controlLoopEnabled = True
 
     def outPosition(self):

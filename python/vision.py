@@ -22,7 +22,7 @@ args = vars(ap.parse_args())
 
 bottles = []
 #vs = VideoStream(src=1)
-vs = cv2.VideoCapture(1)
+vs = cv2.VideoCapture(0)
 record = False 
 
 if ".mp4" in args["record"]: 
@@ -69,8 +69,8 @@ class Bottle:
         x1 = (x-0.5*w) if (x-0.5*w) > 0 else 0
         y1 = (y-0.5*h) if (y-0.5*h) > 0 else 0
         
-        x2 = (x+1.5*w) if (x+1.5*w) < mw else mw
-        y2 = (y+1.5*h) if (y+1.5*h) < mh else mh
+        x2 = (x+1.5*w) if (x+1.5*w) < mw else mw-10
+        y2 = (y+1.5*h) if (y+1.5*h) < mh else mh-10
 
         #crop image
         '''print("MAX W: " + str(mw) + ", H: " + str(mh)) 
@@ -119,7 +119,7 @@ def classify(detections, w, h, CLASSES, COLORS, frame, record=False):
         (startX, startY, endX, endY) = box.astype("int")
 
         # only ouput bottle classifications
-        if(CLASSES[idx] == "bottle" and confidence > minConfidence):
+        if(CLASSES[idx] == "bottle" or CLASSES[idx] == "pottedplant" and confidence > minConfidence):
             bottle = Bottle()
 
             #create classification object
