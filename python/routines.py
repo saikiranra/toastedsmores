@@ -17,6 +17,7 @@ class routines():
         return json.load(open(fname))
 
     def scan(self):
+        self.env.reset()
         self.hasScanned = True
         time.sleep(2)
         self.rob.stowePosition()
@@ -33,6 +34,8 @@ class routines():
                 time.sleep(0.02)
 
     def customRoutine(self , ingredients , output):
+        if type(ingredients) != list:
+            ingredients = [ingredients]
         if not self.hasScanned:
             self.scan()
 
@@ -44,7 +47,7 @@ class routines():
             #self.rob.grab()
             self.rob.stablePosition()
             time.sleep(1)
-            self.rob.goToItem(output)
+            self.goToItem(output)
             time.sleep(0.5)
             self.rob.outPosition()
             time.sleep(1)
