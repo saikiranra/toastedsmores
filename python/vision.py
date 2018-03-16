@@ -13,11 +13,22 @@ from pyzbar.pyzbar import decode
 from PIL import Image
 import json
 import time
+import argparse
+
+ap = argparse.ArgumentParser()
+ap.add_argument("-r", "--record", type=str, action='store', default="", 
+	help="record flag followed by output filename, must end with .mp4")
+args = vars(ap.parse_args())
 
 bottles = []
 #vs = VideoStream(src=1)
-vs = cv2.VideoCapture(0) 
+vs = cv2.VideoCapture(1)
+record = False 
 
+if ".mp4" in args["record"]: 
+    record = True
+
+video_writer = []
 
 class Bottle:
     bottle = dict()
@@ -62,6 +73,9 @@ class Bottle:
         y2 = (y+1.5*h) if (y+1.5*h) < mh else mh
 
         #crop image
+        '''print("MAX W: " + str(mw) + ", H: " + str(mh)) 
+        print("(" + str(x1) + "," + str(y1) + ")") 
+        print("(" + str(x2) + "," + str(y2) + ")") '''
         image = frame.crop((x1, y1, x2, y2))
 
         codes = decode(image)
@@ -87,9 +101,10 @@ def readBarCode(frame):
     if(len(codes) > 0):
         print('QR codes: %s' % codes)
 
-def classify(detections , w, h, CLASSES, COLORS, frame):
-    global bottles
+def classify(detections, w, h, CLASSES, COLORS, frame, record=False):
+    global bottles, video_writer
     minConfidence = 0.1
+
     # loop over the detections
     for i in np.arange(0, detections.shape[2]):
         # extract the confidence (i.e., probability) associated with
@@ -129,6 +144,9 @@ def classify(detections , w, h, CLASSES, COLORS, frame):
             cv2.putText(frame, label, (startX, y),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, COLORS[idx], 2)
 
+    if(record):
+        video_writer.write(frame)
+
 writeTime = time.time()
 writeInterval = 1
 
@@ -158,7 +176,7 @@ def bottlesToFile():
     print(bottleJSON)
 
 def main():
-    global vs, bottles
+    global vs, bottles, record, video_writer
 
 	# initialize the list of class labels MobileNet SSD was trained to
 	# detect, then generate a set of bounding box colors for each class
@@ -182,6 +200,11 @@ def main():
     fps = FPS().start()
     width = 400
     height = 400
+
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    if(record):
+        video_writer = cv2.VideoWriter("output.mp4", fourcc, 20, (400, 225))
+
     # confidence in image classification
     # loop over the frames from the video stream
     while True:
@@ -202,7 +225,10 @@ def main():
         net.setInput(blob)
         detections = net.forward()
 
-        classify(detections, w, h, CLASSES, COLORS, frame)
+        #if(record):
+        #    video_writer.write(frame)
+
+        classify(detections, w, h, CLASSES, COLORS, frame, record)
 
         # show the output frame
         cv2.imshow("Frame", frame)
@@ -210,6 +236,7 @@ def main():
 
         # if the `q` key was pressed, break from the loop
         if key == ord("q"):
+            video_writer.release()
             break
 
         # update the FPS counter
@@ -228,8 +255,8 @@ def main():
     print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
 
     # do a bit of cleanup
+    video_writer.release()
     cv2.destroyAllWindows()
-    vs.stop()
 
 if __name__ == '__main__':
     try:
@@ -237,7 +264,7 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         print('Interrupted')
         try:
-            vs.stop()
+            #video_writer.release()
             cv2.destroyAllWindows()
             sys.exit(0)
         except SystemExit:
