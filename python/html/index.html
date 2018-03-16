@@ -178,6 +178,15 @@
 		});
 	}
 	
+	function addTestData(){
+		var data = ["milk" , "coffee" , "caramel" , "cup"];
+		$("#ingredientSources").empty();
+		for (var i in data) {
+			var item = data[i];
+			var out = '<li><div class="list-group-item"><div class="row-picture"><img class="circle" src="images/'+item+'.jpg" alt="icon"></div><div class="row-content"><h4 class="list-group-item-heading">'+ item + '</h4></div></div></li>'
+			$("#ingredientSources").append(out);
+		}
+	}
 	
 	
 	$( document ).ready(function() {
@@ -241,8 +250,9 @@
 			  </ul>
 			</div>
 			
-			
-
+			<br><br>
+				
+			<a onclick="addTestData()" class="btn btn-raised btn-info">Add Test Data</a>
 
 		</div>
 	</div>
